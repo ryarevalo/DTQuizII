@@ -1,4 +1,3 @@
-
 <div class="row-fluid">
 	<table class="table table-bordered" id="table_records">
 		<thead>

@@ -21,7 +21,7 @@ Question: Advanced Input Field</div>
 <button class="close" data-dismiss="alert"></button>
 The table you start with</div>
 
-<table class="table table-striped table-bordered table-hover">
+<table class="table table-striped table-bordered table-hover" id="advanceiftable">
 <thead>
 <th><span id="add_item_button" class="btn mini green addbutton" onclick="addToObj=false">
 											<i class="icon-plus"></i></span></th>
@@ -31,13 +31,7 @@ The table you start with</div>
 </thead>
 
 <tbody>
-	<tr>
-	<td></td>
-	<td><textarea name="data[1][description]" class="m-wrap  description required" rows="2" ></textarea></td>
-	<td><input name="data[1][quantity]" class=""></td>
-	<td><input name="data[1][unit_price]"  class=""></td>
 	
-</tr>
 
 </tbody>
 
@@ -57,23 +51,106 @@ Your browser does not support the video tag.
 </p>
 
 
-
+<style>
+    #advanceiftable {
+        table-layout: fixed;
+    }
+    
+    .textarea-wrapper, .input-wrapper {
+        
+    }
+    
+    .changable-description, .changable-quantity, changable-unit-price {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 5px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+</style>
 
 
 <?php $this->start('script_own');?>
 <script>
-$(document).ready(function(){
+    $(document).ready(function(){
+        var row_counter = 1;
+        var max_counter = 1;
 
-	$("#add_item_button").click(function(){
+        $("#add_item_button").click(function(){
+            //alert("suppose to add a new row");
 
+            max_counter++;
+            var newRow = jQuery('<tr>' +
+                                '<td><span class="btn mini deletebtn"><i class="icon-delete"></i></span></td>' +
+                                '<td class="textarea-wrapper"><p name="data[' + max_counter +'][description]" class="changable-description m-wrap  description required" rows="2" ></p></td>' +
+                                '<td class="input-wrapper"><p name="data[' + max_counter +'][quantity]" class="changable-quantity"></p></td>' +
+                                '<td class="input-wrapper"><p name="data[' + max_counter +'][unit_price]"  class="changable-unit-price"></p></td>' +
+                                '</tr>');
+            $('#advanceiftable').append(newRow);
+        });
 
-		alert("suppose to add a new row");
-		
+        $('#advanceiftable').on('click', '.deletebtn', function() {
+            $(this).closest('tr').remove();
+        });
+        
+        $('#advanceiftable').on('click', '.textarea-wrapper', function() {
+            // get the data index number of current row
+            var $el = $(this).children();
+            var data_index = $el.attr('name').match(/\[(.*?)\]/)[1];
+            
+            var $replacement = jQuery('<textarea name="data[' + data_index +'][description]" class="changable-description m-wrap  description required" rows="2">'+$el.text()+'</textarea>');
+            
+            if ($el.is('p')){
+                $newel = $replacement.replaceAll($el);
+                $newel.focus();
+                $newel.select();
+            }
+        });
+        
+        $('#advanceiftable').on('click', '.input-wrapper', function() {
+            // get the data index number of current row
+            var $el = $(this).children();
+            var data_index = $el.attr('name').match(/\[(.*?)\]/)[1];
+            
+            if ($el.attr('class').includes('changable-quantity')){
+                var $replacement = jQuery('<input name="data[' + data_index +'][quantity]" class="changable-quantity" value="'+$el.text()+'">');
+            } else if ($el.attr('class').includes('changable-unit-price')){
+                var $replacement = jQuery('<input name="data[' + data_index +'][unit_price]" class="changable-unit-price" value="'+$el.text()+'">');
+            }
+            
+            if ($el.is('p')){
+                $newel = $replacement.replaceAll($el);
+                $newel.focus();
+                $newel.select();
+            }
+        });
+      
 
-		});
-
-	
-});
+        $('#advanceiftable').on('focusout', '.changable-description', function() {
+            var data_index = $(this).attr('name').match(/\[(.*?)\]/)[1];
+            if ($(this).is('textarea')){
+                $(this).replaceWith('<p name="data[' + data_index +'][description]" class="changable-textarea m-wrap  description required">'+$(this).val()+'</p>');
+            }
+        });
+        
+        $('#advanceiftable').on('focusout', '.changable-quantity', function() {
+            var data_index = $(this).attr('name').match(/\[(.*?)\]/)[1];
+            if ($(this).is('input')){
+                $(this).replaceWith('<p name="data[' + data_index +'][quantity]" class="changable-quantity">'+$(this).val()+'</p>');
+            }
+        });
+        
+        $('#advanceiftable').on('focusout', '.changable-unit-price', function() {
+            var data_index = $(this).attr('name').match(/\[(.*?)\]/)[1];
+            if ($(this).is('input')){
+                $(this).replaceWith('<p name="data[' + data_index +'][unit_price]" class="changable-unit-price">'+$(this).val()+'</p>');
+            }
+        });
+    })
 </script>
 <?php $this->end();?>
 
